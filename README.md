@@ -5,7 +5,7 @@
 A full-stack social networking platform built with Go (backend) and React (frontend), run locally via Docker Compose.
 
 - 🌐 **Live Demo:** http://118.178.189.111:8082
-- 📖 **Documentation:** http://118.178.189.111/bluenote/
+- 📖 **Documentation:** http://118.178.189.111:8083/bluenote/
 
 ---
 
