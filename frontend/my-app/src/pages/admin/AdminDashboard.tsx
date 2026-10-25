@@ -5,6 +5,7 @@ import {
   restrictUser, unrestrictUser, adminDeleteUser, promoteToAdmin, demoteAdmin,
 } from '../../api/admin'
 import type { ReportRow, AdminUserRow } from '../../api/admin'
+import { useLanguage } from '../../context/LanguageContext'
 
 type Tab = 'reports' | 'users'
 type ReportStatus = 'pending' | 'removed' | 'dismissed'
@@ -17,6 +18,7 @@ type DialogState =
   | null
 
 function Dialog({ state, onClose }: { state: DialogState; onClose: () => void }) {
+  const { t } = useLanguage()
   const [value, setValue] = useState('')
   useEffect(() => { setValue('') }, [state])
   if (!state) return null
@@ -40,19 +42,19 @@ function Dialog({ state, onClose }: { state: DialogState; onClose: () => void })
           <textarea
             autoFocus
             style={s.dialogInput}
-            placeholder="请输入原因…"
+            placeholder={t('admin.reasonPlaceholder')}
             value={value}
             onChange={e => setValue(e.target.value)}
           />
         )}
         <div style={s.dialogActions}>
-          <button style={s.dialogCancel} onClick={onClose}>取消</button>
+          <button style={s.dialogCancel} onClick={onClose}>{t('common.cancel')}</button>
           <button
             style={state.danger ? s.dialogConfirmDanger : s.dialogConfirm}
             disabled={state.kind === 'prompt' && !value.trim()}
             onClick={submit}
           >
-            确认
+            {t('common.confirm')}
           </button>
         </div>
       </div>
@@ -74,6 +76,7 @@ function Spinner() {
 
 function AdminDashboard() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
   const isSuperAdmin = currentUser.role === 'super_admin'
 
@@ -107,7 +110,7 @@ function AdminDashboard() {
       loadReports()
       loadStats()
     } catch (err) {
-      alert(err instanceof Error ? err.message : '操作失败')
+      alert(err instanceof Error ? err.message : t('admin.actionFailed'))
     }
   }
 
@@ -115,8 +118,8 @@ function AdminDashboard() {
     if (action === 'dismiss') { doResolve(reportId, action); return }
     setDialog({
       kind: 'confirm',
-      title: '下架内容',
-      message: '确认下架该内容？下架后原作者将无法再看到这条内容。',
+      title: t('admin.dialog.removeTitle'),
+      message: t('admin.dialog.removeMsg'),
       danger: true,
       onConfirm: () => doResolve(reportId, action),
     })
@@ -147,72 +150,72 @@ function AdminDashboard() {
       loadUsers()
       loadStats()
     } catch (err) {
-      alert(err instanceof Error ? err.message : '操作失败')
+      alert(err instanceof Error ? err.message : t('admin.actionFailed'))
     }
   }
 
   const handleBan = (u: AdminUserRow) => setDialog({
     kind: 'prompt',
-    title: `封禁 ${u.username}`,
-    message: '封号后该账号将无法登录，请填写封禁原因。',
+    title: t('admin.dialog.banTitle', { name: u.username }),
+    message: t('admin.dialog.banMsg'),
     danger: true,
     onConfirm: reason => runUserAction(() => banUser(u.user_id, reason)),
   })
   const handleUnban = (u: AdminUserRow) => setDialog({
     kind: 'confirm',
-    title: '解除封禁',
-    message: `确认解除 ${u.username} 的封号？`,
+    title: t('admin.dialog.unbanTitle'),
+    message: t('admin.dialog.unbanMsg', { name: u.username }),
     onConfirm: () => runUserAction(() => unbanUser(u.user_id)),
   })
   const handleRestrict = (u: AdminUserRow) => setDialog({
     kind: 'prompt',
-    title: `限制 ${u.username} 发帖`,
-    message: '限制后该账号仍可登录浏览，但无法发布新帖子/评论。',
+    title: t('admin.dialog.restrictTitle', { name: u.username }),
+    message: t('admin.dialog.restrictMsg'),
     onConfirm: reason => runUserAction(() => restrictUser(u.user_id, reason)),
   })
   const handleUnrestrict = (u: AdminUserRow) => setDialog({
     kind: 'confirm',
-    title: '解除发帖限制',
-    message: `确认恢复 ${u.username} 的发帖权限？`,
+    title: t('admin.dialog.unrestrictTitle'),
+    message: t('admin.dialog.unrestrictMsg', { name: u.username }),
     onConfirm: () => runUserAction(() => unrestrictUser(u.user_id)),
   })
   const handleDeleteUser = (u: AdminUserRow) => setDialog({
     kind: 'confirm',
-    title: '删除账号',
-    message: `确认删除账号 ${u.username}？此操作不可恢复。`,
+    title: t('admin.dialog.deleteTitle'),
+    message: t('admin.dialog.deleteMsg', { name: u.username }),
     danger: true,
     onConfirm: () => runUserAction(() => adminDeleteUser(u.user_id)),
   })
   const handlePromote = (u: AdminUserRow) => setDialog({
     kind: 'confirm',
-    title: '设为管理员',
-    message: `确认将 ${u.username} 提升为管理员？`,
+    title: t('admin.dialog.promoteTitle'),
+    message: t('admin.dialog.promoteMsg', { name: u.username }),
     onConfirm: () => runUserAction(() => promoteToAdmin(u.user_id)),
   })
   const handleDemote = (u: AdminUserRow) => setDialog({
     kind: 'confirm',
-    title: '取消管理员',
-    message: `确认取消 ${u.username} 的管理员身份？`,
+    title: t('admin.dialog.demoteTitle'),
+    message: t('admin.dialog.demoteMsg', { name: u.username }),
     onConfirm: () => runUserAction(() => demoteAdmin(u.user_id)),
   })
 
   const roleLabel = (role: string) =>
-    role === 'super_admin' ? '超级管理员' : role === 'admin' ? '管理员' : '普通用户'
+    role === 'super_admin' ? t('role.superAdmin') : role === 'admin' ? t('role.admin') : t('role.user')
   const roleBadgeStyle = (role: string) =>
     role === 'super_admin' ? s.badgePurple : role === 'admin' ? s.badgeBlue : s.badgeGray
 
   const reportTabs: { key: ReportStatus; label: string; icon: string }[] = [
-    { key: 'pending', label: '待处理', icon: '🚩' },
-    { key: 'removed', label: '已下架', icon: '🗑️' },
-    { key: 'dismissed', label: '已驳回', icon: '✅' },
+    { key: 'pending', label: t('admin.reports.pending'), icon: '🚩' },
+    { key: 'removed', label: t('admin.reports.removed'), icon: '🗑️' },
+    { key: 'dismissed', label: t('admin.reports.dismissed'), icon: '✅' },
   ]
 
   return (
     <div style={s.page}>
       <header style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate(-1)}>← 返回</button>
+        <button style={s.backBtn} onClick={() => navigate(-1)}>{t('nav.back')}</button>
         <span style={s.logo}>BlueNote</span>
-        <span style={s.headerTitle}>管理后台</span>
+        <span style={s.headerTitle}>{t('admin.title')}</span>
       </header>
 
       <div className="admin-layout">
@@ -227,11 +230,11 @@ function AdminDashboard() {
             <div style={s.userStats}>
               <div style={s.statItem}>
                 <span style={s.statNum}>{pendingCount}</span>
-                <span style={s.statLabel}>待处理</span>
+                <span style={s.statLabel}>{t('admin.stat.pending')}</span>
               </div>
               <div style={s.statItem}>
                 <span style={s.statNum}>{totalUsers}</span>
-                <span style={s.statLabel}>用户总数</span>
+                <span style={s.statLabel}>{t('admin.stat.totalUsers')}</span>
               </div>
             </div>
           </div>
@@ -241,13 +244,13 @@ function AdminDashboard() {
               style={tab === 'reports' ? s.navItemActive : s.navItem}
               onClick={() => setTab('reports')}
             >
-              🚩 举报审核
+              {t('admin.nav.reports')}
             </button>
             <button
               style={tab === 'users' ? s.navItemActive : s.navItem}
               onClick={() => setTab('users')}
             >
-              👤 用户管理
+              {t('admin.nav.users')}
             </button>
           </div>
         </aside>
@@ -272,28 +275,28 @@ function AdminDashboard() {
             ) : reports.length === 0 ? (
               <div style={s.emptyBox}>
                 <div style={s.emptyIcon}>✨</div>
-                <p style={s.emptyText}>暂无{reportTabs.find(t => t.key === reportStatus)?.label}的举报</p>
+                <p style={s.emptyText}>{t('admin.reports.empty', { label: reportTabs.find(rt => rt.key === reportStatus)?.label ?? '' })}</p>
               </div>
             ) : (
               <div style={s.list}>
                 {reports.map(r => (
                   <div key={r.report_id} style={s.card}>
                     <div style={s.cardTop}>
-                      <span style={s.badgeGray}>{r.target_type === 'post' ? '📝 帖子' : '💬 评论'}</span>
-                      <span style={s.reason}>举报原因：{r.reason}</span>
+                      <span style={s.badgeGray}>{r.target_type === 'post' ? t('admin.report.post') : t('admin.report.comment')}</span>
+                      <span style={s.reason}>{t('admin.report.reason', { reason: r.reason })}</span>
                       <span style={s.meta}>{new Date(r.created_at).toLocaleString()}</span>
                     </div>
                     <p style={s.contentPreview}>
-                      {r.target_removed ? '（内容已被下架）' : (r.content_preview || '（内容不存在）')}
+                      {r.target_removed ? t('admin.report.contentRemoved') : (r.content_preview || t('admin.report.contentMissing'))}
                     </p>
                     <div style={s.cardMeta}>
-                      <span>作者 {r.target_author_username || '未知'}</span>
-                      <span>举报人 {r.reporter_username}</span>
+                      <span>{t('admin.report.author', { name: r.target_author_username || t('admin.report.unknownAuthor') })}</span>
+                      <span>{t('admin.report.reporter', { name: r.reporter_username })}</span>
                     </div>
                     {r.status === 'pending' && (
                       <div style={s.actions}>
-                        <button style={s.dangerBtn} onClick={() => handleResolve(r.report_id, 'remove')}>下架内容</button>
-                        <button style={s.plainBtn} onClick={() => handleResolve(r.report_id, 'dismiss')}>驳回举报</button>
+                        <button style={s.dangerBtn} onClick={() => handleResolve(r.report_id, 'remove')}>{t('admin.report.removeContent')}</button>
+                        <button style={s.plainBtn} onClick={() => handleResolve(r.report_id, 'dismiss')}>{t('admin.report.dismiss')}</button>
                       </div>
                     )}
                   </div>
@@ -308,17 +311,17 @@ function AdminDashboard() {
             <form style={s.filterBar} onSubmit={handleUserSearch}>
               <input
                 style={s.searchInput}
-                placeholder="🔍 按用户名/邮箱搜索"
+                placeholder={t('admin.users.searchPlaceholder')}
                 value={userQuery}
                 onChange={e => setUserQuery(e.target.value)}
               />
               <select style={s.select} value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
-                <option value="">全部角色</option>
-                <option value="user">普通用户</option>
-                <option value="admin">管理员</option>
-                <option value="super_admin">超级管理员</option>
+                <option value="">{t('admin.users.allRoles')}</option>
+                <option value="user">{t('role.user')}</option>
+                <option value="admin">{t('role.admin')}</option>
+                <option value="super_admin">{t('role.superAdmin')}</option>
               </select>
-              <button type="submit" style={s.plainBtn}>搜索</button>
+              <button type="submit" style={s.plainBtn}>{t('common.search')}</button>
             </form>
 
             {usersLoading ? (
@@ -326,7 +329,7 @@ function AdminDashboard() {
             ) : users.length === 0 ? (
               <div style={s.emptyBox}>
                 <div style={s.emptyIcon}>🔎</div>
-                <p style={s.emptyText}>没有匹配的用户</p>
+                <p style={s.emptyText}>{t('admin.users.empty')}</p>
               </div>
             ) : (
               <div style={s.list}>
@@ -338,33 +341,33 @@ function AdminDashboard() {
                         <div style={s.cardTop}>
                           <span style={s.username}>{u.username}</span>
                           <span style={roleBadgeStyle(u.role)}>{roleLabel(u.role)}</span>
-                          {u.is_banned && <span style={s.badgeRed}>已封号</span>}
-                          {u.is_post_restricted && <span style={s.badgeAmber}>限制发帖</span>}
+                          {u.is_banned && <span style={s.badgeRed}>{t('admin.badge.banned')}</span>}
+                          {u.is_post_restricted && <span style={s.badgeAmber}>{t('admin.badge.restricted')}</span>}
                         </div>
                         <div style={s.cardMeta}>
                           <span>{u.email}</span>
-                          <span>发帖 {u.post_count}</span>
-                          <span>注册于 {new Date(u.created_at).toLocaleDateString()}</span>
+                          <span>{t('admin.user.posts', { count: u.post_count })}</span>
+                          <span>{t('admin.user.registeredAt', { date: new Date(u.created_at).toLocaleDateString() })}</span>
                         </div>
-                        {u.is_banned && u.ban_reason && <p style={s.reasonNote}>🔨 封禁原因：{u.ban_reason}</p>}
-                        {u.is_post_restricted && u.restricted_reason && <p style={s.reasonNoteAmber}>✍️ 限制原因：{u.restricted_reason}</p>}
+                        {u.is_banned && u.ban_reason && <p style={s.reasonNote}>{t('admin.user.banReason', { reason: u.ban_reason })}</p>}
+                        {u.is_post_restricted && u.restricted_reason && <p style={s.reasonNoteAmber}>{t('admin.user.restrictReason', { reason: u.restricted_reason })}</p>}
                       </div>
                     </div>
 
                     {u.role !== 'super_admin' && (
                       <div style={s.actions}>
                         {u.is_banned
-                          ? <button style={s.plainBtn} onClick={() => handleUnban(u)}>解除封号</button>
-                          : <button style={s.dangerBtn} onClick={() => handleBan(u)}>封号</button>}
+                          ? <button style={s.plainBtn} onClick={() => handleUnban(u)}>{t('admin.user.unban')}</button>
+                          : <button style={s.dangerBtn} onClick={() => handleBan(u)}>{t('admin.user.ban')}</button>}
                         {u.is_post_restricted
-                          ? <button style={s.plainBtn} onClick={() => handleUnrestrict(u)}>解除限制</button>
-                          : <button style={s.warnBtn} onClick={() => handleRestrict(u)}>限制发帖</button>}
-                        <button style={s.dangerBtn} onClick={() => handleDeleteUser(u)}>删除账号</button>
+                          ? <button style={s.plainBtn} onClick={() => handleUnrestrict(u)}>{t('admin.user.unrestrict')}</button>
+                          : <button style={s.warnBtn} onClick={() => handleRestrict(u)}>{t('admin.user.restrict')}</button>}
+                        <button style={s.dangerBtn} onClick={() => handleDeleteUser(u)}>{t('admin.user.delete')}</button>
                         {isSuperAdmin && u.role === 'user' && (
-                          <button style={s.plainBtn} onClick={() => handlePromote(u)}>设为管理员</button>
+                          <button style={s.plainBtn} onClick={() => handlePromote(u)}>{t('admin.user.promote')}</button>
                         )}
                         {isSuperAdmin && u.role === 'admin' && (
-                          <button style={s.plainBtn} onClick={() => handleDemote(u)}>取消管理员</button>
+                          <button style={s.plainBtn} onClick={() => handleDemote(u)}>{t('admin.user.demote')}</button>
                         )}
                       </div>
                     )}

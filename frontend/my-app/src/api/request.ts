@@ -1,3 +1,5 @@
+import { translations } from '../i18n/translations'
+
 const API_BASE = ''
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -17,7 +19,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       localStorage.removeItem('user')
       window.location.href = '/'
     }
-    throw new Error(data.error || '请求失败')
+    const lang = (localStorage.getItem('lang') as 'en' | 'zh') || 'en'
+    throw new Error(data.error || translations[lang]['error.request'])
   }
   return data
 }

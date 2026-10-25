@@ -1,3 +1,5 @@
+import { translations } from '../i18n/translations'
+
 const API_BASE = ''
 
 // 上传接口使用 multipart/form-data，不能用通用 request 封装
@@ -11,6 +13,9 @@ export const uploadImage = async (file: File): Promise<string> => {
     body: form,
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data.error || '上传失败')
+  if (!res.ok) {
+    const lang = (localStorage.getItem('lang') as 'en' | 'zh') || 'en'
+    throw new Error(data.error || translations[lang]['error.upload'])
+  }
   return data.url as string
 }
