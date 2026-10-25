@@ -77,11 +77,12 @@ func SearchUsers(q string, limit int) ([]UserRow, int64, error) {
 SELECT user_id, username, bio, profile_picture
 FROM users
 WHERE username ILIKE ?
+  AND password_hash <> ''
 LIMIT ?`, pattern, limit).Scan(&rows).Error; err != nil {
 		return nil, 0, err
 	}
 	var total int64
-	conf.DB.Raw("SELECT COUNT(*) FROM users WHERE username ILIKE ?", pattern).Scan(&total)
+	conf.DB.Raw("SELECT COUNT(*) FROM users WHERE username ILIKE ? AND password_hash <> ''", pattern).Scan(&total)
 	if rows == nil {
 		rows = []UserRow{}
 	}

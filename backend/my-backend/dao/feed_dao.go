@@ -73,6 +73,7 @@ func GetRecommendedUsers(currentUserID uuid.UUID, limit int) ([]RecommendedUserR
 SELECT u.user_id, u.username, u.bio, u.profile_picture
 FROM users u
 WHERE u.user_id != ?
+  AND u.password_hash <> ''
   AND u.user_id NOT IN (
       SELECT followee_id FROM follows WHERE follower_id = ?
   )
