@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import request from '../api/request'
 import PostCard from '../components/PostCard'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 import type { FeedPostsResponse, Post } from '../types'
 
 const getTagPosts = (name: string, cursor = '', limit = 20) =>
@@ -66,7 +67,7 @@ function TagPosts() {
     <div style={s.page}>
       <header style={s.header}>
         <button style={s.backBtn} onClick={() => navigate(-1)}>{t('nav.back')}</button>
-        <span style={s.logo}>{t('app.name')}</span>
+        <span style={s.logo}><Logo /></span>
         <span style={s.tag}>#{name}</span>
       </header>
 

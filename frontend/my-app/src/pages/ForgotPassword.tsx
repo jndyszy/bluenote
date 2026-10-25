@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { sendPasswordResetCode } from '../api/auth'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 function ForgotPassword() {
   const { lang, t, toggle } = useLanguage()
@@ -32,7 +33,7 @@ function ForgotPassword() {
         <span style={lang === 'zh' ? s.langActive : s.langInactive}>中文</span>
       </button>
       <div className="auth-card">
-        <div style={s.logo}>{t('app.name')}</div>
+        <div style={s.logo}><Logo /></div>
         <h2 style={s.title}>{t('auth.forgotPasswordTitle')}</h2>
         <p style={s.desc}>{t('auth.forgotPasswordDesc')}</p>
 

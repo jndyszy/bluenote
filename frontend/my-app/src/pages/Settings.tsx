@@ -1,5 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 function Settings() {
   const navigate = useNavigate()
@@ -9,7 +10,7 @@ function Settings() {
     <div style={s.page}>
       <header style={s.header}>
         <button style={s.backBtn} onClick={() => navigate(-1)}>{t('nav.back')}</button>
-        <span style={s.logo}>{t('app.name')}</span>
+        <span style={s.logo}><Logo /></span>
         <span style={s.headerTitle}>{t('settings.title')}</span>
       </header>
 

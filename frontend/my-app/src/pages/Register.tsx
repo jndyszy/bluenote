@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { register } from '../api/auth'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 function Register() {
   const { lang, t, toggle } = useLanguage()
@@ -42,7 +43,7 @@ function Register() {
         <span style={lang === 'zh' ? s.langActive : s.langInactive}>中文</span>
       </button>
       <div className="auth-card">
-        <div style={s.logo}>{t('app.name')}</div>
+        <div style={s.logo}><Logo /></div>
         <h2 style={s.title}>{t('auth.register')}</h2>
 
         <form onSubmit={handleSubmit} style={s.form}>

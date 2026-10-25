@@ -6,6 +6,7 @@ import {
 } from '../../api/admin'
 import type { ReportRow, AdminUserRow } from '../../api/admin'
 import { useLanguage } from '../../context/LanguageContext'
+import Logo from '../../components/Logo'
 
 type Tab = 'reports' | 'users'
 type ReportStatus = 'pending' | 'removed' | 'dismissed'
@@ -214,7 +215,7 @@ function AdminDashboard() {
     <div style={s.page}>
       <header style={s.header}>
         <button style={s.backBtn} onClick={() => navigate(-1)}>{t('nav.back')}</button>
-        <span style={s.logo}>BlueNote</span>
+        <span style={s.logo}><Logo /></span>
         <span style={s.headerTitle}>{t('admin.title')}</span>
       </header>
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { searchUsers, searchPosts } from '../api/search'
 import PostCard from '../components/PostCard'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 import type { SimpleUser, Post } from '../types'
 
 type Tab = 'users' | 'posts'
@@ -76,7 +77,7 @@ function Search() {
         <button style={s.backBtn} onClick={() => navigate(-1)}>
           {t('nav.back')}
         </button>
-        <span style={s.logo}>{t('app.name')}</span>
+        <span style={s.logo}><Logo /></span>
         <span style={s.headerTitle}>{t('search.title')}</span>
       </header>
 

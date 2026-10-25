@@ -6,6 +6,7 @@ import { uploadImage } from '../api/upload'
 import { getNotifications, getUnreadCount, markAllRead } from '../api/notifications'
 import PostCard from '../components/PostCard'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 import type { Post, UserCard, HotTag, RecommendedUser, Notification } from '../types'
 
 function Home() {
@@ -184,7 +185,7 @@ function Home() {
     <div style={s.page}>
       {/* Header */}
       <header style={s.header}>
-        <span style={s.logo}>{t('app.name')}</span>
+        <span style={s.logo}><Logo /></span>
         <div style={s.headerRight}>
           <button style={s.searchBtn} onClick={() => navigate('/search')}>{t('nav.search')}</button>
           {userCard && (

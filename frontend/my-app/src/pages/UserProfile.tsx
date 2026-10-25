@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { getUserProfile, getFollowing, getFollowers, followUser, unfollowUser } from '../api/users'
 import PostCard from '../components/PostCard'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 import type { UserProfile as Profile, SimpleUser, Post } from '../types'
 
 type Tab = 'posts' | 'following' | 'followers'
@@ -119,7 +120,7 @@ function UserProfile() {
     <div style={s.page}>
       <header style={s.header}>
         <button style={s.backBtn} onClick={() => navigate(-1)}>{t('nav.back')}</button>
-        <span style={s.logo}>{t('app.name')}</span>
+        <span style={s.logo}><Logo /></span>
         <span style={s.headerTitle}>{profile.username}</span>
         {!isOwn && (
           <button

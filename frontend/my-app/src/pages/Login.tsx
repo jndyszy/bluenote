@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { login } from '../api/auth'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 function Login() {
   const location = useLocation()
@@ -38,7 +39,7 @@ function Login() {
         <span style={lang === 'zh' ? s.langActive : s.langInactive}>中文</span>
       </button>
       <div className="auth-card">
-        <div style={s.logo}>{t('app.name')}</div>
+        <div style={s.logo}><Logo /></div>
         <h2 style={s.title}>{t('auth.login')}</h2>
 
         {successMsg && <p style={s.success}>{successMsg}</p>}

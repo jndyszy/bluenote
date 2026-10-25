@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { confirmPasswordReset } from '../api/auth'
 import { useLanguage } from '../context/LanguageContext'
+import Logo from '../components/Logo'
 
 function ResetPassword() {
   const location = useLocation()
@@ -51,7 +52,7 @@ function ResetPassword() {
       <div className="auth-page">
         {LangToggle}
         <div className="auth-card">
-          <div style={s.logo}>{t('app.name')}</div>
+          <div style={s.logo}><Logo /></div>
           <p style={{ textAlign: 'center', color: '#555', fontSize: '14px' }}>
             {t('auth.pageExpired')}
             <Link to="/forgot-password" style={s.link}> {t('auth.forgotPasswordLink')}</Link>
@@ -65,7 +66,7 @@ function ResetPassword() {
     <div className="auth-page">
       {LangToggle}
       <div className="auth-card">
-        <div style={s.logo}>{t('app.name')}</div>
+        <div style={s.logo}><Logo /></div>
         <h2 style={s.title}>{t('auth.resetPasswordTitle')}</h2>
         <p style={s.desc}>{t('auth.codeSentTo')}<br /><strong>{email}</strong></p>
 
