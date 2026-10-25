@@ -38,7 +38,8 @@ A full-stack social networking platform built with Go (backend) and React (front
 - **Content Reporting** — Report posts or comments
 - **Rate Limiting** — IP-based Redis counter (60 req/min global; 10 req/min upload)
 - **Recommended Users** — Cached user recommendations (Redis, 10-minute TTL)
-- **i18n** — Language context with translation support
+- **i18n** — English / Chinese UI with a language toggle (context + translation table)
+- **MCP Server** — an [MCP](https://modelcontextprotocol.io) server (`mcp/`) that exposes the REST API as tools, so an AI assistant can operate the platform
 
 ---
 
@@ -141,19 +142,34 @@ PostgreSQL / Redis
 │       ├── utils/              # JWT, email helpers
 │       └── conf/               # DB and Redis initialization
 │
-└── frontend/
-    ├── Dockerfile              # Multi-stage: node:22-alpine → nginx:alpine
-    ├── nginx.conf              # SPA fallback + /api proxy
-    └── my-app/
-        └── src/
-            ├── router/         # React Router routes
-            ├── pages/          # Page components (9 pages)
-            ├── components/     # Shared components (PostCard)
-            ├── api/            # API client layer
-            ├── context/        # LanguageContext (i18n)
-            ├── types/          # TypeScript interfaces
-            └── i18n/           # Translation strings
+├── frontend/
+│   ├── Dockerfile              # Multi-stage: node:22-alpine → nginx:alpine
+│   ├── nginx.conf              # SPA fallback + /api proxy
+│   └── my-app/
+│       └── src/
+│           ├── router/         # React Router routes
+│           ├── pages/          # Page components (incl. admin dashboard)
+│           ├── components/     # Shared components (PostCard, Logo)
+│           ├── api/            # API client layer
+│           ├── context/        # LanguageContext (i18n)
+│           ├── types/          # TypeScript interfaces
+│           └── i18n/           # Translation strings (en / zh)
+│
+└── mcp/                        # MCP server — wraps the REST API as MCP tools
+    ├── Dockerfile
+    └── src/index.ts
 ```
+
+### Component docs
+
+Each part has its own README with deeper detail:
+
+- [`backend/my-backend/README.md`](backend/my-backend/README.md) — Go API: architecture, design decisions, full endpoint list
+- [`frontend/my-app/README.md`](frontend/my-app/README.md) — React SPA: features, implementation highlights
+- [`mcp/README.md`](mcp/README.md) — MCP server: tools, config, how to connect
+- [`部署指南.md`](部署指南.md) — 中文本地部署与运维指南
+
+Full user documentation lives at the docs site: **http://118.178.189.111:8083/bluenote/**
 
 ---
 
@@ -270,7 +286,7 @@ PostgreSQL / Redis
 
 ```bash
 git clone https://github.com/jndyszy/bluenote.git
-cd CN6000
+cd bluenote
 ```
 
 ### 2. Configure Environment Variables

@@ -13,6 +13,8 @@ This is the frontend for a Xiaohongshu-inspired lifestyle content sharing platfo
 - **Content Moderation**: Report posts and comments with categorised reasons
 - **GDPR Compliance**: Account deletion flow with username confirmation, clears all local state on success
 - **Discovery**: Full-text post search, user search, hot tags sidebar, recommended users sidebar, and tag browsing pages
+- **Bilingual UI (i18n)**: English / Chinese with a language toggle, backed by `context/LanguageContext` + an `i18n/` translation table; the choice is persisted
+- **Admin Dashboard**: `/admin` — report moderation and user management (ban / restrict / delete / promote), for admin accounts
 
 ## Technology Stack
 
@@ -21,7 +23,7 @@ This is the frontend for a Xiaohongshu-inspired lifestyle content sharing platfo
 | Framework | React 19 |
 | Language | TypeScript 5.9 |
 | Build Tool | Vite 7 |
-| Routing | React Router v6 |
+| Routing | React Router v7 |
 | HTTP | Native Fetch API |
 | Styling | React inline CSSProperties |
 | Auth | JWT Bearer Token (localStorage) |
@@ -44,9 +46,11 @@ This is the frontend for a Xiaohongshu-inspired lifestyle content sharing platfo
 
 ```
 src/
-├── api/            # One file per domain (auth, feed, posts, users, search, upload)
-├── components/     # PostCard — the core interactive unit of the app
-├── pages/          # One file per route
+├── api/            # One file per domain (auth, feed, posts, users, search, upload, notifications, admin)
+├── components/     # PostCard (core interactive unit) + Logo
+├── context/        # LanguageContext — i18n provider + language toggle
+├── i18n/           # Translation table (en / zh)
+├── pages/          # One file per route (incl. admin/AdminDashboard)
 ├── router/         # BrowserRouter + Routes config
 └── types/          # Shared TypeScript interfaces
 ```
@@ -64,6 +68,7 @@ src/
 | `/profile/edit` | Edit Profile |
 | `/search` | Search |
 | `/tags/:name` | Tag Posts |
+| `/admin` | Admin Dashboard (admin only) |
 
 ## Getting Started
 

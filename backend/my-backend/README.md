@@ -49,7 +49,9 @@ my-backend/
 │   ├── auth_controller.go
 │   ├── post_controller.go
 │   ├── user_controller.go
+│   ├── notification_controller.go
 │   ├── report_controller.go
+│   ├── admin_controller.go   # Moderation & user management (admin only)
 │   └── upload_controller.go
 ├── dao/                   # Data access layer (raw SQL / GORM queries)
 │   ├── post_dao.go        # Feed queries with visibility filter & weighted sort
@@ -174,6 +176,26 @@ All protected endpoints require `Authorization: Bearer <token>`.
 | GET | `/api/search/posts` | Full-text search posts |
 | GET | `/api/tags/:name/posts` | Posts by hashtag |
 | POST | `/api/upload/image` | Upload image (10 MB max, JPEG/PNG/GIF/WebP) |
+| GET | `/api/notifications` | List notifications (likes, comments, replies) |
+| GET | `/api/notifications/unread-count` | Unread notification count |
+| POST | `/api/notifications/read-all` | Mark all notifications as read |
+
+### Admin (admin / super_admin only)
+
+Guarded by `RequireAdmin` / `RequireSuperAdmin` middleware — a normal account gets `403`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/admin/reports` | List reports (`?status=pending\|removed\|dismissed`) |
+| POST | `/api/admin/reports/:id/resolve` | Resolve a report (`remove` / `dismiss`) |
+| GET | `/api/admin/users` | List / search users (`?query=&role=`) |
+| POST | `/api/admin/users/:id/ban` · `/unban` | Ban / unban a user |
+| POST | `/api/admin/users/:id/restrict` · `/unrestrict` | Restrict / unrestrict posting |
+| DELETE | `/api/admin/users/:id` | Delete a user account |
+| DELETE | `/api/admin/posts/:id` · `/comments/:id` | Delete any post / comment |
+| POST | `/api/admin/users/:id/promote` · `/demote` | Grant / revoke admin role (**super_admin** only) |
+
+> These endpoints are also exposed as MCP tools — see [`../../mcp/README.md`](../../mcp/README.md).
 
 ---
 

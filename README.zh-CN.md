@@ -38,7 +38,8 @@
 - **内容举报** — 举报帖子或评论
 - **限流** — 基于 IP 的 Redis 计数器(全局 60 次/分钟;上传 10 次/分钟)
 - **推荐用户** — 缓存的用户推荐(Redis,10 分钟 TTL)
-- **国际化(i18n)** — 带翻译支持的语言上下文(中 / 英双语)
+- **国际化(i18n)** — 中 / 英双语界面,带语言切换(上下文 + 翻译表)
+- **MCP 服务** — 一个 [MCP](https://modelcontextprotocol.io) 服务(`mcp/`),把 REST API 暴露为工具,让 AI 助手可直接操作平台
 
 ---
 
@@ -141,19 +142,34 @@ PostgreSQL / Redis
 │       ├── utils/              # JWT、邮件工具
 │       └── conf/               # 数据库与 Redis 初始化
 │
-└── frontend/
-    ├── Dockerfile              # 多阶段:node:22-alpine → nginx:alpine
-    ├── nginx.conf              # SPA 兜底 + /api 代理
-    └── my-app/
-        └── src/
-            ├── router/         # React Router 路由
-            ├── pages/          # 页面组件(9 个页面)
-            ├── components/     # 公共组件(PostCard)
-            ├── api/            # API 客户端层
-            ├── context/        # LanguageContext(i18n)
-            ├── types/          # TypeScript 接口定义
-            └── i18n/           # 翻译文案
+├── frontend/
+│   ├── Dockerfile              # 多阶段:node:22-alpine → nginx:alpine
+│   ├── nginx.conf              # SPA 兜底 + /api 代理
+│   └── my-app/
+│       └── src/
+│           ├── router/         # React Router 路由
+│           ├── pages/          # 页面组件(含管理后台)
+│           ├── components/     # 公共组件(PostCard、Logo)
+│           ├── api/            # API 客户端层
+│           ├── context/        # LanguageContext(i18n)
+│           ├── types/          # TypeScript 接口定义
+│           └── i18n/           # 翻译文案(中 / 英)
+│
+└── mcp/                        # MCP 服务 —— 把 REST API 封装为 MCP 工具
+    ├── Dockerfile
+    └── src/index.ts
 ```
+
+### 子项目文档
+
+各部分都有自己的 README,包含更详细的说明:
+
+- [`backend/my-backend/README.md`](backend/my-backend/README.md) —— Go 后端:架构、设计决策、完整接口清单
+- [`frontend/my-app/README.md`](frontend/my-app/README.md) —— React 前端:功能、实现要点
+- [`mcp/README.md`](mcp/README.md) —— MCP 服务:工具、配置、连接方式
+- [`部署指南.md`](部署指南.md) —— 中文本地部署与运维指南
+
+完整用户文档见文档站:**http://118.178.189.111:8083/bluenote/**
 
 ---
 
