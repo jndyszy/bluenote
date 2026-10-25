@@ -62,7 +62,7 @@ function fail(e: unknown) {
 }
 
 function buildServer(): McpServer {
-  const server = new McpServer({ name: "bluenote-mcp", version: "1.0.0" });
+  const server = new McpServer({ name: "bluenote-mcp", version: "1.1.0" });
 
   server.registerTool(
     "login",
@@ -256,6 +256,170 @@ function buildServer(): McpServer {
       try {
         return ok(await api("/api/notifications", { token }));
       } catch (e) { return fail(e); }
+    },
+  );
+
+  // ── Admin tools ────────────────────────────────────────────────
+  // These require an admin / super_admin account. The restriction is enforced
+  // server-side (backend RequireAdmin / RequireSuperAdmin middleware): a normal
+  // account's token gets HTTP 403, surfaced here as an error.
+
+  server.registerTool(
+    "admin_list_reports",
+    {
+      description: "[Admin] List content reports. status: pending | removed | dismissed (omit for all).",
+      inputSchema: {
+        token: z.string().describe("JWT of an admin account"),
+        status: z.enum(["pending", "removed", "dismissed"]).optional(),
+        limit: z.number().int().positive().max(100).optional(),
+        offset: z.number().int().nonnegative().optional(),
+      },
+    },
+    async ({ token, status, limit, offset }) => {
+      try { return ok(await api("/api/admin/reports", { token, query: { status, limit, offset } })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_resolve_report",
+    {
+      description: "[Admin] Resolve a report. action: 'remove' (take down the content) or 'dismiss'.",
+      inputSchema: {
+        token: z.string().describe("JWT of an admin account"),
+        report_id: z.string(),
+        action: z.enum(["remove", "dismiss"]),
+      },
+    },
+    async ({ token, report_id, action }) => {
+      try { return ok(await api(`/api/admin/reports/${report_id}/resolve`, { method: "POST", token, body: { action } })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_list_users",
+    {
+      description: "[Admin] List / search users. query: username or email; role: user | admin | super_admin.",
+      inputSchema: {
+        token: z.string().describe("JWT of an admin account"),
+        query: z.string().optional(),
+        role: z.enum(["user", "admin", "super_admin"]).optional(),
+        limit: z.number().int().positive().max(100).optional(),
+        offset: z.number().int().nonnegative().optional(),
+      },
+    },
+    async ({ token, query, role, limit, offset }) => {
+      try { return ok(await api("/api/admin/users", { token, query: { query, role, limit, offset } })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_ban_user",
+    {
+      description: "[Admin] Ban a user (the account can no longer log in). A reason is required.",
+      inputSchema: { token: z.string(), user_id: z.string(), reason: z.string().min(1) },
+    },
+    async ({ token, user_id, reason }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/ban`, { method: "POST", token, body: { reason } })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_unban_user",
+    {
+      description: "[Admin] Lift a ban on a user.",
+      inputSchema: { token: z.string(), user_id: z.string() },
+    },
+    async ({ token, user_id }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/unban`, { method: "POST", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_restrict_user",
+    {
+      description: "[Admin] Restrict a user from posting/commenting (can still log in and browse). A reason is required.",
+      inputSchema: { token: z.string(), user_id: z.string(), reason: z.string().min(1) },
+    },
+    async ({ token, user_id, reason }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/restrict`, { method: "POST", token, body: { reason } })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_unrestrict_user",
+    {
+      description: "[Admin] Remove a user's posting restriction.",
+      inputSchema: { token: z.string(), user_id: z.string() },
+    },
+    async ({ token, user_id }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/unrestrict`, { method: "POST", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_delete_user",
+    {
+      description: "[Admin] Permanently delete a user account. Irreversible.",
+      inputSchema: { token: z.string(), user_id: z.string() },
+    },
+    async ({ token, user_id }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}`, { method: "DELETE", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_delete_post",
+    {
+      description: "[Admin] Delete any post by id (content moderation).",
+      inputSchema: { token: z.string(), post_id: z.string() },
+    },
+    async ({ token, post_id }) => {
+      try { return ok(await api(`/api/admin/posts/${post_id}`, { method: "DELETE", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_delete_comment",
+    {
+      description: "[Admin] Delete any comment by id (content moderation).",
+      inputSchema: { token: z.string(), comment_id: z.string() },
+    },
+    async ({ token, comment_id }) => {
+      try { return ok(await api(`/api/admin/comments/${comment_id}`, { method: "DELETE", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_promote_user",
+    {
+      description: "[Super admin] Promote a user to admin. Requires a super_admin account.",
+      inputSchema: { token: z.string(), user_id: z.string() },
+    },
+    async ({ token, user_id }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/promote`, { method: "POST", token })); }
+      catch (e) { return fail(e); }
+    },
+  );
+
+  server.registerTool(
+    "admin_demote_user",
+    {
+      description: "[Super admin] Remove a user's admin role. Requires a super_admin account.",
+      inputSchema: { token: z.string(), user_id: z.string() },
+    },
+    async ({ token, user_id }) => {
+      try { return ok(await api(`/api/admin/users/${user_id}/demote`, { method: "POST", token })); }
+      catch (e) { return fail(e); }
     },
   );
 

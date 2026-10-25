@@ -26,7 +26,20 @@ An [MCP](https://modelcontextprotocol.io) server that wraps the BlueNote REST AP
 | `get_user` | A user's profile + posts |
 | `get_notifications` | Current user's notifications |
 
-> The first version exposes read + light-write tools only. Admin / destructive actions (ban, delete account, resolve reports) are intentionally **not** exposed.
+#### Admin tools
+
+These require an **admin / super_admin** account. The restriction is enforced server-side (backend `RequireAdmin` / `RequireSuperAdmin`): a normal account's token gets HTTP 403, surfaced as a tool error.
+
+| Tool | Description |
+|------|-------------|
+| `admin_list_reports` | List content reports (status: pending / removed / dismissed) |
+| `admin_resolve_report` | Resolve a report (remove / dismiss) |
+| `admin_list_users` | List / search users (by name/email, role) |
+| `admin_ban_user` / `admin_unban_user` | Ban / unban an account |
+| `admin_restrict_user` / `admin_unrestrict_user` | Restrict / unrestrict posting |
+| `admin_delete_user` | Delete a user account (irreversible) |
+| `admin_delete_post` / `admin_delete_comment` | Delete any post / comment |
+| `admin_promote_user` / `admin_demote_user` | Grant / revoke admin role (**super_admin** only) |
 
 ### Configuration
 
@@ -96,7 +109,20 @@ For stdio-only clients, bridge with: `npx mcp-remote http://YOUR_HOST:8084/mcp`
 | `get_user` | 用户主页 + 帖子 |
 | `get_notifications` | 当前用户的通知 |
 
-> 第一版只暴露读 + 轻量写工具。管理 / 危险操作(封号、删号、处理举报)**故意没有**开放。
+#### 管理员工具
+
+以下工具需要 **admin / super_admin** 账号。该限制由**后端强制**(`RequireAdmin` / `RequireSuperAdmin` 中间件):普通账号的 token 调用会得到 HTTP 403,在工具里表现为报错。
+
+| 工具 | 说明 |
+|------|------|
+| `admin_list_reports` | 举报列表(status:pending / removed / dismissed) |
+| `admin_resolve_report` | 处理举报(remove 下架 / dismiss 驳回) |
+| `admin_list_users` | 用户列表 / 搜索(按名称或邮箱、角色) |
+| `admin_ban_user` / `admin_unban_user` | 封号 / 解封 |
+| `admin_restrict_user` / `admin_unrestrict_user` | 限制 / 解除发帖限制 |
+| `admin_delete_user` | 删除用户账号(不可恢复) |
+| `admin_delete_post` / `admin_delete_comment` | 删除任意帖子 / 评论 |
+| `admin_promote_user` / `admin_demote_user` | 任免管理员(**仅 super_admin**) |
 
 ### 配置项
 
