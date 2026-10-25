@@ -1,5 +1,7 @@
 # BlueNote (小蓝书) — Full-Stack Social Media Platform
 
+**English** | [中文](README.zh-CN.md)
+
 A full-stack social networking platform built with Go (backend) and React (frontend), run locally via Docker Compose.
 
 ---
