@@ -1,4 +1,4 @@
-# BlueNote (小蓝书) — Frontend
+# BlueNote — Frontend
 
 ## Overview
 

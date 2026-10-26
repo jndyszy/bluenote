@@ -1,6 +1,8 @@
-# BlueNote (小蓝书) — 全栈社交媒体平台
+# 小蓝书 — 全栈社交媒体平台
 
 [English](README.md) | **中文**
+
+> **小蓝书** 是本产品的中文名;英文版名为 **BlueNote**(见 [English](README.md))。
 
 一个使用 Go(后端)与 React(前端)构建的全栈社交平台,通过 Docker Compose 在本地运行。
 

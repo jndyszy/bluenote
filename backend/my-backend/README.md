@@ -1,4 +1,4 @@
-# BlueNote (小蓝书) — Backend
+# BlueNote — Backend
 
 > RESTful API backend for a social media platform (Xiaohongshu-inspired), built with Go, Gin, PostgreSQL, and Redis.
 
